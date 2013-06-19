@@ -1,14 +1,14 @@
 <?php
 /**
- * @author		Bram(us) Van Damme <bramus@bram.us>
- * @copyright	Copyright (c), 2013 Bram(us) Van Damme
- * @license		MIT public license
+ * @author      Bram(us) Van Damme <bramus@bram.us>
+ * @copyright   Copyright (c), 2013 Bram(us) Van Damme
+ * @license     MIT public license
  */
 
 namespace Bramus\Router;
 
-class Router {
-
+class Router
+{
 
 	/**
 	 * @var array The route patterns and their handling functions
@@ -35,8 +35,13 @@ class Router {
 	 * @param string $pattern A route pattern such as /about/system
 	 * @param object $fn The handling function to be executed
 	 */
-	public function before($methods, $pattern, $fn) {
-
+	public function before($methods, $pattern, $fn)
+	{
+		// Check callable
+		if (! is_callable($fn)) {
+			throw new InvalidArgumentException('$fn is not callable');
+		}
+		
 		$pattern = '/' . trim($pattern, '/');
 
 		foreach (explode('|', $methods) as $method) {
@@ -55,8 +60,13 @@ class Router {
 	 * @param string $pattern A route pattern such as /about/system
 	 * @param object $fn The handling function to be executed
 	 */
-	public function match($methods, $pattern, $fn) {
-
+	public function match($methods, $pattern, $fn)
+	{
+		// Check callable
+		if (! is_callable($fn)) {
+			throw new InvalidArgumentException('$fn is not callable');
+		}
+		
 		$pattern = '/' . trim($pattern, '/');
 
 		foreach (explode('|', $methods) as $method) {
@@ -75,7 +85,8 @@ class Router {
 	 * @param string $pattern A route pattern such as /about/system
 	 * @param object $fn The handling function to be executed
 	 */
-	public function get($pattern, $fn) {
+	public function get($pattern, $fn)
+	{
 		$this->match('GET', $pattern, $fn);
 	}
 
@@ -86,7 +97,8 @@ class Router {
 	 * @param string $pattern A route pattern such as /about/system
 	 * @param object $fn The handling function to be executed
 	 */
-	public function post($pattern, $fn) {
+	public function post($pattern, $fn)
+	{
 		$this->match('POST', $pattern, $fn);
 	}
 
@@ -97,7 +109,8 @@ class Router {
 	 * @param string $pattern A route pattern such as /about/system
 	 * @param object $fn The handling function to be executed
 	 */
-	public function delete($pattern, $fn) {
+	public function delete($pattern, $fn)
+	{
 		$this->match('DELETE', $pattern, $fn);
 	}
 
@@ -108,7 +121,8 @@ class Router {
 	 * @param string $pattern A route pattern such as /about/system
 	 * @param object $fn The handling function to be executed
 	 */
-	public function put($pattern, $fn) {
+	public function put($pattern, $fn)
+	{
 		$this->match('PUT', $pattern, $fn);
 	}
 
@@ -119,7 +133,8 @@ class Router {
 	 * @param string $pattern A route pattern such as /about/system
 	 * @param object $fn The handling function to be executed
 	 */
-	public function options($pattern, $fn) {
+	public function options($pattern, $fn)
+	{
 		$this->match('OPTIONS', $pattern, $fn);
 	}
 
@@ -129,8 +144,8 @@ class Router {
 	 *
 	 * @param object $callback Function to be executed after a matching route was handled (= after router middleware)
 	 */
-	public function run($callback = null) {
-
+	public function run($callback = null)
+	{
 		// Handle all before middlewares
 		if (isset($this->befores[$_SERVER['REQUEST_METHOD']]))
 			$this->handle($this->befores[$_SERVER['REQUEST_METHOD']]);
@@ -147,7 +162,7 @@ class Router {
 		}
 		// If a route was handled, perform the finish callback (if any)
 		else {
-			if ($callback) $callback();
+			if (is_callable($callback)) $callback();
 		}
 	}
 
@@ -156,7 +171,13 @@ class Router {
 	 * Set the 404 handling function
 	 * @param object $fn The function to be executed
 	 */
-	public function set404($fn) {
+	public function set404($fn)
+	{
+		// Check callable
+		if (! is_callable($fn)) {
+			throw new InvalidArgumentException('$fn is not callable');
+		}
+		
 		$this->notFound = $fn;
 	}
 
@@ -167,8 +188,8 @@ class Router {
 	 * @param boolean $quitAfterRun Does the handle function need to quit after one route was matched?
 	 * @return int The number of routes handled
 	 */
-	private function handle($routes, $quitAfterRun = false) {
-
+	private function handle($routes, $quitAfterRun = false)
+	{
 		// Counter to keep track of the number of routes we've handled
 		$numHandled = 0;
 
@@ -213,8 +234,8 @@ class Router {
 	 * Define the current relative URI
 	 * @return string
 	 */
-	private function getCurrentUri() {
-
+	private function getCurrentUri()
+	{
 		// Current Request URI
 		$uri = $_SERVER['REQUEST_URI'];
 
@@ -233,5 +254,3 @@ class Router {
 	}
 
 }
-
-// EOF
