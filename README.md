@@ -273,38 +273,35 @@ There's no such thing as `$_PUT` in PHP. One must fake it:
 
 ## Router method
 
-	/**
-	 * Example environment
-	 * 
-	 * Request URI:
-	 * '/app/index.php/virtual_path', without URL rewrite
-	 * '/app/virtual_path', with URL rewrite
-	 * 
-	 */
+### Example environment
 
-	// Get an instance of self
+Request URI:
+- '/app/index.php/virtual_path', without URL rewrite
+- '/app/virtual_path', with URL rewrite
+
+Get an instance of self
+
 	$router = Router::getInstance();
-	
-	// Get script path
+
+Get script path
+
 	$router->getScriptName();
 	// => '/app/' with URL rewrite
 	// => '/app/index.php' without URL rewrite,
 	
-	// Get script directory
+Get script directory
+
 	$router->getScriptDir();
 	// => '/app/'
-	
-	// Get path trailing script
+
+Get path trailing script
+
 	$router->getPathInfo();
 	// => '/virtual_path'
-	
-	/**
-	 * Redirect to URI
-	 * 
-	 * @param string $uri Target URI
-	 * @param boolean $relative Append to script path ?
-	 * @param boolean $exit Exit ?
-	 */
+
+Redirect to URI
+
+	// $router->redirect($uri, $relative, $exit);
 	
 	// redirect to '/path', and exit()
 	$router->redirect('/path');
@@ -317,21 +314,18 @@ There's no such thing as `$_PUT` in PHP. One must fake it:
 	
 	// if using URL rewrite, this will redirect to '/app/path'
 	$router->redirect('/path', true);
-	
-	
-	/**
-	 * Return specify URI append to the script URI
-	 * 
-	 * @param string $uri URI relate to script path
-	 * @return string Absolute URI path
-	 */
+
+Return specify URI append to the script URI
 	
 	$router->path('/path');
 	// => '/app/index.php/path' // with URL rewrite
 	// => '/app/path' // without URL rewrite
-	
-	
-	
+
+Return a resource path relate to script directory
+
+	$router->asset('/img/logo.jpg');
+	// => '/app/img/logo.jpg'
+
 
 ## Acknowledgements
 
