@@ -329,8 +329,11 @@ Return a resource path relate to script directory
 
 ## Acknowledgements
 
-`Router` is base on `bramus/router`
-`bramus/router` is inspired upon [Klein](https://github.com/chriso/klein.php), [Ham](https://github.com/radiosilence/Ham), and [JREAM/route](https://bitbucket.org/JREAM/route) . Whilst Klein provides lots of features it is not object oriented. Whilst Ham is Object Oriented, it's bad at _separation of concerns_ as it also provides templating within the routing class. Whilst JREAM/route is a good starting point it is limited in what it does (only GET routes for example).
+`Router` is base on `bramus/router`, `bramus/router` is inspired upon [Klein](https://github.com/chriso/klein.php),
+[Ham](https://github.com/radiosilence/Ham), and [JREAM/route](https://bitbucket.org/JREAM/route). Whilst Klein
+provides lots of features it is not object oriented. Whilst Ham is Object Oriented, it's bad
+at _separation of concerns_ as it also provides templating within the routing class. Whilst JREAM/route
+is a good starting point it is limited in what it does (only GET routes for example).
 
 
 
