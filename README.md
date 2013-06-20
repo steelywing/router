@@ -9,6 +9,7 @@ My english is not good, if has something doesn't understand, please see the sour
 
 - Static Route Patterns
 - Dynamic Route Patterns
+- Support handler: function, class static method, instance method
 - `GET`, `POST`, `PUT`, `DELETE`, and `OPTIONS` request methods
 - Custom 404 handling
 - Before Route Middlewares
@@ -67,7 +68,8 @@ Using handler function
 	$router = new \Router\Router();
 	$router->get('/', 'index');
 
-Support lazy instance creating and chaining
+Support lazy controller instance creating and chaining, controller instance will auto create, and
+only will create 1 instance per class in `$router->run()`
 
 	class Controller
 	{
@@ -85,12 +87,22 @@ Support lazy instance creating and chaining
 		{
 			// ...
 		}
+		
+		public static function staticHandler()
+		{
+			// ...
+		}
 	}
 	
 	$router = new \Router\Router();
 	$router->get('/', 'Controller->index')
 		->get('/product', 'Controller->product')
-		->get('/contact', 'Controller->contact');
+		->get('/contact', 'Controller->contact')
+		->get('/static', 'Controller::staticHandler');
+	
+	// and you can also use array($instance, 'method'), then Router will not create instance
+	$controller = new Controller();
+	$router->get('/unlazy', array($controller, 'index'));
 
 `Router` supports `GET`, `POST`, `PUT`, `DELETE`, and `OPTIONS` HTTP request methods. Pass in
 a single request method, or multiple request methods separated by `|`
