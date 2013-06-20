@@ -1,42 +1,29 @@
-# bramus/router
+# Router
 
-A lightweight and simple object oriented PHP Router.
-Built by Bram(us) Van Damme - [http://www.bram.us](http://www.bram.us)
-
-[![Build Status](https://secure.travis-ci.org/bramus/router.png)](http://travis-ci.org/bramus/router)
-
+A lightweight PHP Router
+Base on [https://github.com/bramus/router](bramus/router)
 
 ## Features
 
 - Static Route Patterns
 - Dynamic Route Patterns
-- Optional Route Subpatterns
 - `GET`, `POST`, `PUT`, `DELETE`, and `OPTIONS` request methods
 - Custom 404 handling
 - Before Route Middlewares
 - Before Router Middlewares
-- After Router Middleware (Finish Callback)
+- After Router Middleware
 - Works fine in subfolders
-
 
 
 ## Prerequisites/Requirements
 
 - PHP 5.3 or greater
-- [URL Rewriting](https://gist.github.com/bramus/5332525)
-
+- URL Rewriting (optional)
 
 
 ## Installation
 
-Installation is possible using Composer
-
-	{
-		"require": {
-			"bramus/router": "dev-master"
-		}
-	}
-
+	require_once '/Router/Router.php'
 
 
 ## Demo
@@ -44,41 +31,84 @@ Installation is possible using Composer
 A demo is included in the `demo` subfolder. Serve it using your favorite web server, or using PHP 5.4's built-in server by executing `php -S localhost:8080` on the shell. A `.htaccess` for use with Apache is included.
 
 
-
 ## Usage
 
-Create an instance of `\Bramus\Router\Router`, define some routes onto it, and run it.
+Create an instance of `\Router\Router`, define some routes onto it, and run it.
 
 	// Require composer autoloader
-	require __DIR__ . '/vendor/autoload.php';
+	require '/Router/Router.php';
 
 	// Create Router instance
-	$router = new \Bramus\Router\Router();
+	$router = new \Router\Router();
 
 	// Define routes
-	...
-
-	// Run it!
-	$router->run();
+	$router->get('/', function () {
+		echo 'Hello world !';
+	})->run(); // support chaining
 
 
 ### Routing
 
-Hook __routes__ (a combination of one or more HTTP methods and a pattern) using `$router->match(method(s), pattern, function)`:
+Using anonymous function
 
-	$router->match('GET|POST', 'pattern', function() { … });
+	$router = new \Router\Router();
+	$router->get('/', function () {
+		echo 'Homepage';
+	});
 
-`bramus/router` supports `GET`, `POST`, `PUT`, `DELETE`, and `OPTIONS` HTTP request methods. Pass in a single request method, or multiple request methods separated by `|`.
+Using handler function
 
-When a route matches, the attached __route handling function__ will be executed. Only the first route matched will be handled. When no matching route is found, an `'HTTP/1.1 404 Not Found'` status code will be returned.
+	function index() {
+		// ...
+	}
+	
+	$router = new \Router\Router();
+	$router->get('/', 'index');
 
-Shorthands for single request methods are provided:
+Support lazy instance creating and chaining
 
-	$router->get('pattern', function() { … });
-	$router->post('pattern', function() { … });
-	$router->put('pattern', function() { … });
-	$router->delete('pattern', function() { … });
-	$router->options('pattern', function() { … });
+	class Controller
+	{
+		public function index()
+		{
+			// ...
+		}
+		
+		public function product()
+		{
+			// ...
+		}
+		
+		public function contact()
+		{
+			// ...
+		}
+	}
+	
+	$router = new \Router\Router();
+	$router->get('/', 'Controller->index')
+		->get('/product', 'Controller->product')
+		->get('/contact', 'Controller->contact');
+
+`Router` supports `GET`, `POST`, `PUT`, `DELETE`, and `OPTIONS` HTTP request methods. Pass in
+a single request method, or multiple request methods separated by `|`
+
+	$router = new \Router\Router();
+	$router->get( '/', function() {} )
+		->post( '/path', function() {} )
+		
+		// match = get | post
+		->match( '/path', function() {} )
+		
+		// map specify method
+		->map( 'GET|POST|PUT|DELETE', function () {} )
+		
+		->put( '/path', function() {} )
+		->delete( '/path', function() {} )
+		->options( '/path', function() {} );
+
+When a route matches, the attached __route handling function__ will be executed. Only the first route matched
+will be handled. When no matching route is found, an `'HTTP/1.1 404 Not Found'` status code will be returned.
 
 Note: Routes must be hooked before `$router->run();` is being called.
 
@@ -95,6 +125,11 @@ Commonly used subpatterns within Dynamic Route Patterns are:
 - `[a-z0-9_-]+` = One or more word characters (a-z 0-9 _) and the dash (-)
 - `.*` = Any character (including `/`), zero or more
 - `[^/]+` = Any character but `/`, one or more
+
+Auto convert patterns:
+- `:string` = `[a-zA-Z]+`
+- `:number` = `[0-9]+`
+- `:alpha` = `[a-zA-Z0-9-_]+`,
 
 Note: The [PHP PCRE Cheat Sheet](https://www.cs.washington.edu/education/courses/190m/12sp/cheat-sheets/php-regex-cheat-sheet.pdf) might come in handy.
 
@@ -150,11 +185,11 @@ To make things complete use [quantifiers](http://www.php.net/manual/en/regexp.re
 	}
 
 
-### Custom 404
+### Custom 404 not found page
 
-Override the default 404 handler using `$router->set404(function);`
+Override the default 404 handler using `$router->setNotFound(function);`
 
-	$router->set404(function() {
+	$router->setNotFound(function() {
 		header('HTTP/1.1 404 Not Found');
 		// ... do something special here
 	});
@@ -164,7 +199,7 @@ The 404 will be executed when no route pattern was matched to the current URL.
 
 ### Before Route Middlewares
 
-`bramus/router` supports __Before Route Middlewares__, which are executed before the route handling is processed.
+`Router` supports __Before Route Middlewares__, which are executed before the route handling is processed.
 
 Like route handling functions, you hook a handling function to a combination of one or more HTTP request methods and a specific route pattern.
 
@@ -189,17 +224,19 @@ Before route middlewares are route specific. Using a general route pattern (viz.
 
 ### After Router Middleware / Run Callback
 
-Run one (1) middleware function, name the __After Router Middleware__ _(in other projects sometimes referred to as after app middlewares)_ after the routing was processed. Just pass it along the `$router->run()` function. The run callback is route independent.
+Run middleware function, name the __After Router Middleware__ _(in other projects sometimes
+referred to as after app middlewares)_ after the routing was processed.
 
-	$router->run(function() { … });
+	$router->after('GET', '/.*', function() {
+		// ... this will always be executed
+	});
 
 Note: If the route handling function has `exit()`ed the run callback won't be run.
 
 
-
 ## Integration with other libraries
 
-Integrate other libraries with `bramus/router` by making good use of the `use` keyword to pass dependencies into the handling functions.
+Integrate other libraries with `router/router` by making good use of the `use` keyword to pass dependencies into the handling functions.
 
 	$tpl = new \Acme\Template\Template();
 
@@ -211,7 +248,7 @@ Integrate other libraries with `bramus/router` by making good use of the `use` k
 	});
 
 	$router->run(function() use ($tpl) {
-    	$tpl->display();
+		$tpl->display();
 	});
 
 Given this structure it is still possible to manipulate the output from within the After Router Middleware
@@ -232,24 +269,75 @@ There's no such thing as `$_PUT` in PHP. One must fake it:
 	});
 
 
+## Router method
 
-## Unit Testing & Code Coverage
+	/**
+	 * Example environment
+	 * 
+	 * Request URI:
+	 * '/app/index.php/virtual_path', without URL rewrite
+	 * '/app/virtual_path', with URL rewrite
+	 * 
+	 */
 
-`bramus/router` ships with unit tests using [PHPUnit](https://github.com/sebastianbergmann/phpunit/).
+	// Get an instance of self
+	$router = Router::getInstance();
+	
+	// Get script path
+	$router->getScriptName();
+	// => '/app/' with URL rewrite
+	// => '/app/index.php' without URL rewrite,
+	
+	// Get script directory
+	$router->getScriptDir();
+	// => '/app/'
+	
+	// Get path trailing script
+	$router->getPathInfo();
+	// => '/virtual_path'
+	
+	/**
+	 * Redirect to URI
+	 * 
+	 * @param string $uri Target URI
+	 * @param boolean $relative Append to script path ?
+	 * @param boolean $exit Exit ?
+	 */
+	
+	// redirect to '/path', and exit()
+	$router->redirect('/path');
+	
+	// redirect to '/app/index.php/path', and exit()
+	$router->redirect('/path', true);
 
-- If PHPUnit is installed globally run `phpunit` to run the tests.
-
-- If PHPUnit is not installed globally, install it locally throuh composer by running `composer install --dev`. Run the tests themselves by calling `vendor/bin/phpunit`.
-
-  The included `composer.json` will also install `php-code-coverage` which allows one to generate a __Code Coverage Report__. Run `phpunit --coverage-html ./tests-report` (XDebug required), a report will be placed into the `tests-report` subfolder.
-
+	// redirect to '/app/index.php/path', and continue
+	$router->redirect('/path', true, false);
+	
+	// if using URL rewrite, this will redirect to '/app/path'
+	$router->redirect('/path', true);
+	
+	
+	/**
+	 * Return specify URI append to the script URI
+	 * 
+	 * @param string $uri URI relate to script path
+	 * @return string Absolute URI path
+	 */
+	
+	$router->path('/path');
+	// => '/app/index.php/path' // with URL rewrite
+	// => '/app/path' // without URL rewrite
+	
+	
+	
 
 ## Acknowledgements
 
+`Router` is base on `bramus/router`
 `bramus/router` is inspired upon [Klein](https://github.com/chriso/klein.php), [Ham](https://github.com/radiosilence/Ham), and [JREAM/route](https://bitbucket.org/JREAM/route) . Whilst Klein provides lots of features it is not object oriented. Whilst Ham is Object Oriented, it's bad at _separation of concerns_ as it also provides templating within the routing class. Whilst JREAM/route is a good starting point it is limited in what it does (only GET routes for example).
 
 
 
 ## License
 
-`bramus/router` is released under the MIT public license. See the enclosed `LICENSE` for details.
+`Router` is released under the MIT public license. See the enclosed `LICENSE` for details.
