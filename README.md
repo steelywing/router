@@ -3,6 +3,8 @@
 A lightweight PHP Router
 Base on [https://github.com/bramus/router](bramus/router)
 
+My english is not good, if has something doesn't understand, please see the source code, it is lightweight and simple.
+
 ## Features
 
 - Static Route Patterns
