@@ -26,7 +26,7 @@ My english is not good, if has something doesn't understand, please see the sour
 
 ## Installation
 
-	require_once '/Router/Router.php'
+	require_once 'Router.php'
 
 
 ## Demo
@@ -36,13 +36,13 @@ A demo is included in the `demo` subfolder. Serve it using your favorite web ser
 
 ## Usage
 
-Create an instance of `\Router\Router`, define some routes onto it, and run it.
+Create an instance of `Router`, define some routes onto it, and run it.
 
 	// Require composer autoloader
-	require '/Router/Router.php';
+	require 'Router.php';
 
 	// Create Router instance
-	$router = new \Router\Router();
+	$router = new Router();
 
 	// Define routes
 	$router->get('/', function () {
@@ -54,7 +54,7 @@ Create an instance of `\Router\Router`, define some routes onto it, and run it.
 
 Using anonymous function
 
-	$router = new \Router\Router();
+	$router = new Router();
 	$router->get('/', function () {
 		echo 'Homepage';
 	});
@@ -65,7 +65,7 @@ Using handler function
 		// ...
 	}
 	
-	$router = new \Router\Router();
+	$router = new Router();
 	$router->get('/', 'index');
 
 Support lazy controller instance creating and chaining, controller instance will auto create, and
@@ -94,7 +94,7 @@ only will create 1 instance per class in `$router->run()`
 		}
 	}
 	
-	$router = new \Router\Router();
+	$router = new Router();
 	$router->get('/', 'Controller->index')
 		->get('/product', 'Controller->product')
 		->get('/contact', 'Controller->contact')
@@ -107,7 +107,7 @@ only will create 1 instance per class in `$router->run()`
 `Router` supports `GET`, `POST`, `PUT`, `DELETE`, and `OPTIONS` HTTP request methods. Pass in
 a single request method, or multiple request methods separated by `|`
 
-	$router = new \Router\Router();
+	$router = new Router();
 	$router->get( '/', function() {} )
 		->post( '/path', function() {} )
 		
@@ -250,7 +250,7 @@ Note: If the route handling function has `exit()`ed the run callback won't be ru
 
 ## Integration with other libraries
 
-Integrate other libraries with `router/router` by making good use of the `use` keyword to pass dependencies into the handling functions.
+Integrate other libraries with `Router` by making good use of the `use` keyword to pass dependencies into the handling functions.
 
 	$tpl = new \Acme\Template\Template();
 
