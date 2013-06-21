@@ -107,7 +107,10 @@ class Router
      */
     public static function getInstance()
     {
-        return is_null(self::$instance) ? new self() : self::$instance;
+        if (is_null(self::$instance)) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
     
     
