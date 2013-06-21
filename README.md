@@ -68,7 +68,7 @@ Using handler function
 	$router = new Router();
 	$router->get('/', 'index');
 
-Support lazy controller instance creating and chaining, controller instance will auto create, and
+Support lazy (Dependency Injection) controller instance creating and chaining, controller instance will auto create, and
 only will create 1 instance per class in `$router->run()`
 
 	class Controller
